@@ -1,40 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useReducer } from 'react';
+
+const initialState={message: "hi"};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "yell":
+      return {
+        message: `HEY! I just said ${state.message}`
+      };
+    default:
+    case "whisper":
+      return {
+        message: `excuse me, I just said ${state.message}`
+      };
+  }
+}
 
 function UseReducerTest() {
-  const [data, setData] = useState([]);
-  const [name, setName] = useState("Jan");
-  const [admin, setAdmin] = useState(true);
-
-  useEffect(() => {
-    console.log(`Celebrate ${name}`)
-    document.title= `Celebrate ${name}`;
-  }, [name]);
-
-  useEffect(() => {
-    console.log(`The user is ${admin}`)
-  }, [admin]);
-
-  useEffect(() => {
-    fetch("http://api.github.com/users")
-      .then(response => response.json())
-      .then(setData)
-    ;
-  }, [admin]);
+  const [number, setNumber] = useReducer(
+    (number, newNumber) => number + newNumber,
+    0
+  );
+  const [checked, toggleChecked] = useReducer(
+    (checked) => !checked,
+    false
+  );
+  const [state, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   return (
-    <section>
-      <p>Congratualtions {name}</p>
-      <button onClick={() => setName("Will")}>Change Winner</button>
-      <p>{admin ? "logged in" : "not logged in"}</p>
-      <button onClick={() => setAdmin(!admin)}>Login</button>
-      <p>{data.length === 0 ? "No Users" : "Some users"}</p>
-      <button onClick={() => setData([])}>Remove Data</button>
-      <ul>
-        {data.map((user) => (
-          <li key={user.id}>{user.login}</li>
-        ))}
-      </ul>
-    </section>
+    <>
+      <h1 onClick={() => setNumber(1)}>
+        {number}
+      </h1>
+
+      <input type="checkbox" value={checked}
+        onChange={toggleChecked}
+      />
+      <p>{checked ? "checked" : "not checked"}</p>
+
+      <p>Mesage: {state.message}</p>
+      <button onClick={() => dispatch({type: "yell"})}>YELL</button>
+      <button onClick={() => dispatch({type: "whisper"})}>whisper</button>
+    </>
   )
 }
 
